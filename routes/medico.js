@@ -9,7 +9,10 @@ var Medico = require('../models/medico');
 app.get('/', (req, res) => {
 	
 
-	Medico.find({}).exec((err, medicos) => {
+	Medico.find({})
+	.populate('usuario', 'nombre email')
+	.populate('hospital')
+	.exec((err, medicos) => {
 		if (err) {
 			return res.status(500).json({
 				ok: false,

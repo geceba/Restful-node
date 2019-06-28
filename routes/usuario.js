@@ -1,6 +1,5 @@
 var express = require('express');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 var mdAuth = require('../middlewares/autenticacion');
 
