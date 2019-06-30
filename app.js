@@ -19,6 +19,7 @@ var usuarioRoutes = require('./routes/usuario');
 var loginRooutes = require('./routes/login');
 var hospitalRoutes = require('./routes/hospital');
 var medicoRoutes = require('./routes/medico');
+var busquedaRoutes = require('./routes/busqueda');
 
 
 // conexion a la base de datos
@@ -33,6 +34,7 @@ app.use('/usuario', usuarioRoutes);
 app.use('/login', loginRooutes);
 app.use('/hospital', hospitalRoutes);
 app.use('/medico', medicoRoutes);
+app.use('/busqueda', busquedaRoutes);
 app.use('/', appRoutes);
 
 
