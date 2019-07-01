@@ -5,6 +5,52 @@ var Usuario = require('../models/usuario');
 
 var app = express();
 
+
+/*
+=====================
+	Busqueda General	
+=====================
+ */
+
+
+ app.get('/coleccion/:tabla/:busqueda', (req, res) => {
+	var busqueda = req.params.busqueda;
+	var tabla = req.params.tabla;
+
+	var regex  = new RegExp(busqueda, 'i');
+	var promesa;
+
+	switch(tabla) {
+		case 'usuarios':
+			promesa = buscarUsuario(busqueda, regex);
+			break;
+		case 'hospitales':
+			promesa = buscarHospitales(busqueda, regex);
+			break;
+		case 'medicos':
+			promesa = buscarMedicos(busqueda, regex);
+			break; 
+		default:
+			return res.status(400).json({
+				ok: false,
+				mensaje: "Los tipos de busqueda sólo son: usuario, hospital, medico",
+				error: { message: "Tipo de tabla/colección no válido"}
+			});
+	}
+
+	promesa.then(data => {
+		return res.status(200).json({
+			ok: true,
+			[tabla]: data
+		});
+	})
+ });
+/*
+=====================
+	Busqueda General	
+=====================
+ */
+
 app.get('/todo/:busqueda', (req, res, next) => {
 	var busqueda = req.params.busqueda;
 
