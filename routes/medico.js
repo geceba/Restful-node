@@ -11,27 +11,54 @@ app.get('/', (req, res) => {
 	desde = Number(desde);
 
 	Medico.find({})
-	.skip(desde)
-	.limit(5)
-	.populate('usuario', 'nombre email')
-	.populate('hospital')
-	.exec((err, medicos) => {
+		.skip(desde)
+		.limit(5)
+		.populate('usuario', 'nombre email')
+		.populate('hospital')
+		.exec((err, medicos) => {
+			if (err) {
+				return res.status(500).json({
+					ok: false,
+					mensaje: 'Error: no se pudo cargar medicos',
+					errros: err
+				});
+			}
+
+			Medico.count({}, (err, count) => {
+				res.status(200).json({
+					ok: true,
+					medicos: medicos,
+					total: count
+				});
+			});
+		});
+});
+
+//obtener medicos
+app.get('/:id', (req, res) => {
+	var id = req.params.id;
+
+	Medico.findById(id).populate('usuario', 'nombre email img').populate('hospital').exec((err, medico) => {
 		if (err) {
 			return res.status(500).json({
 				ok: false,
-				mensaje: 'Error: no se pudo cargar medicos',
-				errros: err
+				mensaje: 'Error: no se pudo buscar el medico',
+				erros: err
 			});
 		}
 
-		Medico.count({}, (err, count) => {
-			res.status(200).json({
-				ok: true,
-				medicos: medicos,
-				total: count
+		if (!medico) {
+			return res.status(400).json({
+				ok: false,
+				mensaje: 'Error: el medico con el id: ' + id + ' no existe',
+				erros: { message: 'no existe medico con ese id' }
 			});
-		});
+		}
 
+		return res.status(200).json({
+			ok: true,
+			medico: medico
+		});
 	});
 });
 
@@ -63,7 +90,6 @@ app.put('/:id', mdAuth.verificaToken, (req, res) => {
 		medico.nombre = body.nombre;
 		medico.usuario = req.usuario._id;
 		medico.hospital = body.hospital;
-	
 
 		medico.save((err, medicoGuardado) => {
 			if (err) {
@@ -87,11 +113,11 @@ app.put('/:id', mdAuth.verificaToken, (req, res) => {
 app.post('/', mdAuth.verificaToken, (req, res) => {
 	var body = req.body;
 
-    console.log("body", body)
+	console.log('body', body);
 	var medico = new Medico({
 		nombre: body.nombre,
-        usuario: req.usuario._id, // obtener el usuario por medio del request
-        hospital: body.hospital
+		usuario: req.usuario._id, // obtener el usuario por medio del request
+		hospital: body.hospital
 	});
 
 	medico.save((err, medicoGuardado) => {
