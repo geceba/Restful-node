@@ -1,17 +1,17 @@
-var express = require('express');
+let express = require('express');
 const bcrypt = require('bcrypt');
 
-var mdAuth = require('../middlewares/autenticacion');
+let mdAuth = require('../middlewares/autenticacion');
 
-var app = express();
+let app = express();
 
-var Usuario = require('../models/usuario');
+let Usuario = require('../models/usuario');
 
 // obtener todos los usuarios
 
 app.get('/', (req, res, next) => {
 
-	var desde = req.query.desde || 0;
+	let desde = req.query.desde || 0;
 	desde = Number(desde);
 
 	Usuario.find({}, 'nombre email img role google')
@@ -41,9 +41,9 @@ app.get('/', (req, res, next) => {
 // crear un nuevo usuario
 
 app.post('/', (req, res) => {
-	var body = req.body;
+	let body = req.body;
 
-	var usuario = new Usuario({
+	let usuario = new Usuario({
 		nombre: body.nombre,
 		email: body.email,
 		password: bcrypt.hashSync(body.password, 10),
@@ -70,9 +70,9 @@ app.post('/', (req, res) => {
 
 // actualizar usuario
 
-app.put('/:id', mdAuth.verificaToken, (req, res) => {
-	var id = req.params.id;
-	var body = req.body;
+app.put('/:id', [mdAuth.verificaToken, mdAuth.verificarAdminOrUser], (req, res) => {
+	let id = req.params.id;
+	let body = req.body;
 
 	Usuario.findById(id, (err, usuario) => {
 		if (err) {
@@ -115,8 +115,8 @@ app.put('/:id', mdAuth.verificaToken, (req, res) => {
 });
 
 // delete 
-app.delete('/:id', mdAuth.verificaToken, (req, res) => {
-	var id = req.params.id;
+app.delete('/:id', [mdAuth.verificaToken, mdAuth.verificaAdminRole], (req, res) => {
+	let id = req.params.id;
 
 	Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
 		if (err) {
